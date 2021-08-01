@@ -34,8 +34,10 @@ inline auto sq( const T& x )
 template<typename T>
 inline T wrap_angle( T theta )
 {
+	/* numer / denom, returns floating p*/
 	const T modded = fmod( theta,(T)2.0 * (T)PI_D );
+	/* if greater than pi take the modded version = 2 pi, otherwise just return the modded.*/
 	return (modded > (T)PI_D) ?
 		(modded - (T)2.0 * (T)PI_D) :
 		modded;
-}
+} 

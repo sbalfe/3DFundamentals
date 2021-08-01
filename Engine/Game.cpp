@@ -40,6 +40,7 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
+	/* press these keys to rotate the cube*/
 	const float dt = 1.0f / 60.0f;
 	if( wnd.kbd.KeyIsPressed( 'Q' ) )
 	{
@@ -70,6 +71,7 @@ void Game::UpdateModel()
 void Game::ComposeFrame()
 {
 	auto lines = cube.GetLines();
+	/* combine all three of the rotation angles in each of the axis to gain various movements*/
 	const Mat3 rot =
 		Mat3::RotationX( theta_x ) *
 		Mat3::RotationY( theta_y ) *

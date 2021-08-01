@@ -40,7 +40,7 @@ void Game::Go()
 
 void Game::UpdateModel()
 {
-	const float dt = 1.0f / 60.0f;
+	const float dt = 1.0f / 144.0f;
 	if( wnd.kbd.KeyIsPressed( 'Q' ) )
 	{
 		theta_x = wrap_angle( theta_x + dTheta * dt );
@@ -102,6 +102,7 @@ void Game::ComposeFrame()
 		v += { 0.0f,0.0f,offset_z };
 		pst.Transform( v );
 	}
+	/* go throuhg each of the 3 indexed vertices to obtain eac of the triangles*/
 	for( auto i = triangles.indices.cbegin(),
 		end = triangles.indices.cend();
 		i != end; std::advance( i,3 ) )

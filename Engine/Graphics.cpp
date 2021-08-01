@@ -393,10 +393,12 @@ void Graphics::DrawTriangle( const Vec2& v0,const Vec2& v1,const Vec2& v2,Color 
 	if( pv1->y < pv0->y ) std::swap( pv0,pv1 );
 	if( pv2->y < pv1->y ) std::swap( pv1,pv2 );
 	if( pv1->y < pv0->y ) std::swap( pv0,pv1 );
+	
 
+	// if they share the same y coordinate v0 and v1, then it has a flat top or straight line at top
 	if( pv0->y == pv1->y ) // natural flat top
 	{
-		// sorting top vertices by x
+		// sorting top vertices by x, v0 must be on the left
 		if( pv1->x < pv0->x ) std::swap( pv0,pv1 );
 		DrawFlatTopTriangle( *pv0,*pv1,*pv2,c );
 	}
@@ -414,8 +416,16 @@ void Graphics::DrawTriangle( const Vec2& v0,const Vec2& v1,const Vec2& v2,Color 
 			(pv2->y - pv0->y);
 		const Vec2 vi = *pv0 + (*pv2 - *pv0) * alphaSplit;
 
+		/*
+			if x of splittig vertex is less than vertex of v1, then its clearly
+		*/
 		if( pv1->x < vi.x ) // major right
 		{
+			/* the order of the inputs here matters as the flat bottom and top*/
+
+			/*
+				refer to ipad drawings but this is the order of vertices from the top of the triangle
+			*/
 			DrawFlatBottomTriangle( *pv0,*pv1,vi,c );
 			DrawFlatTopTriangle( *pv1,vi,*pv2,c );
 		}
@@ -429,11 +439,11 @@ void Graphics::DrawTriangle( const Vec2& v0,const Vec2& v1,const Vec2& v2,Color 
 
 void Graphics::DrawFlatTopTriangle( const Vec2& v0,const Vec2& v1,const Vec2& v2,Color c )
 {
-	// calulcate slopes in screen space
+	// calulcate slopes in screen space, run over rise , avoid infinite slope from the straight lines upwards
 	float m0 = (v2.x - v0.x) / (v2.y - v0.y);
 	float m1 = (v2.x - v1.x) / (v2.y - v1.y);
 
-	// calculate start and end scanlines
+	// calculate start and end scanlines, start and end y coordinates to render in 
 	const int yStart = (int)ceil( v0.y - 0.5f );
 	const int yEnd = (int)ceil( v2.y - 0.5f ); // the scanline AFTER the last line drawn
 
@@ -441,10 +451,31 @@ void Graphics::DrawFlatTopTriangle( const Vec2& v0,const Vec2& v1,const Vec2& v2
 	{
 		// caluclate start and end points (x-coords)
 		// add 0.5 to y value because we're calculating based on pixel CENTERS
+
+		/*
+			px0, we take the gradient of the left line and use to calculate how far we have moved from the 
+
+			originall value of v0.x of which we are adding on here
+
+			this calculation is done via first centering the scanline , y, by adding 1/2 , start from center of pixel
+
+			there is some value of y for the top vertex so we must take the difference of our central coordinate to obtain the y distance
+
+			this y distance and multiplication by gradient obtains the distance in x down that side, just add our initial x value to obtaint the final value
+
+			same principles for px1.
+		*/
 		const float px0 = m0 * (float( y ) + 0.5f - v0.y) + v0.x;
 		const float px1 = m1 * (float( y ) + 0.5f - v1.y) + v1.x;
 
 		// calculate start and end pixels
+
+		/* for the x start we take the ceiling to apply top left raster rule
+			
+			pixels are discrete values on our buffer to fill in the screen depending on window size
+
+			this negation of 1/2 ensures we cut of pixel centers that are outside of the line
+		*/
 		const int xStart = (int)ceil( px0 - 0.5f );
 		const int xEnd = (int)ceil( px1 - 0.5f ); // the pixel AFTER the last pixel drawn
 

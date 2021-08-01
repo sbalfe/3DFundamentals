@@ -117,6 +117,26 @@ void Game::OutputSceneName() const
 
 void Game::ComposeFrame()
 {
+<<<<<<< HEAD
 	// draw scene
 	(*curScene)->Draw();
+=======
+	auto triangles = cube.GetTriangles();
+	const Mat3 rot =
+		Mat3::RotationX( theta_x ) *
+		Mat3::RotationY( theta_y ) *
+		Mat3::RotationZ( theta_z );
+	for( auto& v : triangles.vertices )
+	{
+		v *= rot;
+		v += { 0.0f,0.0f,offset_z };
+		pst.Transform( v );
+	}
+	for( auto i = triangles.indices.cbegin(),
+		end = triangles.indices.cend();
+		i != end; std::advance( i,3 ) )
+	{
+		gfx.DrawTriangle( triangles.vertices[*i],triangles.vertices[*std::next( i )],triangles.vertices[*std::next( i,2 )],Colors::White );
+	}
+>>>>>>> parent of dc80f73... diff colored triangles are funky
 }

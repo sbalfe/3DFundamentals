@@ -111,6 +111,7 @@ public:
 	{
 		return _Vec3( *this ) *= rhs;
 	}
+	/* cross product */
 	_Vec3	operator%( const _Vec3& rhs ) const
 	{
 		return _Vec3(

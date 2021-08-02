@@ -67,6 +67,11 @@ public:
 			const Vec3& v0 = triangles.vertices[triangles.indices[i * 3]];
 			const Vec3& v1 = triangles.vertices[triangles.indices[i * 3 + 1]];
 			const Vec3& v2 = triangles.vertices[triangles.indices[i * 3 + 2]];
+			/* 
+				perform the cross product of the triangle to find the normal, then take dot product with view vector
+				
+				>= 0.0f , to not cull triangles that are perpendicular. 
+			*/
 			triangles.cullFlags[i] = (v1 - v0) % (v2 - v0) * v0 > 0.0f;
 		}
 		// transform to screen space (includes perspective transform)

@@ -16,5 +16,6 @@ struct IndexedTriangleList
 	}
 	std::vector<Vec3> vertices;
 	std::vector<size_t> indices;
+	/* tells us which triangles should not be drawn */
 	std::vector<bool> cullFlags;
 };

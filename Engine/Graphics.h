@@ -58,6 +58,7 @@ public:
 	void EndFrame();
 	void BeginFrame();
 	void DrawTriangle( const Vec2& v0,const Vec2& v1,const Vec2& v2,Color c );
+	/* takes 3 textured vertices and a surface */
 	void DrawTriangleTex( const TexVertex& v0,const TexVertex& v1,const TexVertex& v2,const Surface& tex );
 	void DrawTriangleTexWrap( const TexVertex& v0,const TexVertex& v1,const TexVertex& v2,const Surface& tex );
 	void DrawLine( const Vec2& p1,const Vec2& p2,Color c )

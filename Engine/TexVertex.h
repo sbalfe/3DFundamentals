@@ -11,6 +11,7 @@ public:
 		pos( pos ),
 		tc( tc )
 	{}
+	/* interpolation between 2 texture vertices */
 	TexVertex InterpolateTo( const TexVertex& dest,float alpha ) const
 	{
 		return{
@@ -59,6 +60,7 @@ public:
 		return TexVertex( *this ) /= rhs;
 	}
 public:
+	/* our textures now must include the texture coordinate */
 	Vec3 pos;
 	Vec2 tc;
 };

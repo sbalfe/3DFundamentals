@@ -5,6 +5,7 @@
 #include "IndexedLineList.h"
 #include "IndexedTriangleList.h"
 #include "TexVertex.h"
+#include <stdexcept>
 
 class CubeFolded
 {

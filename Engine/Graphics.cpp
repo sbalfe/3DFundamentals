@@ -26,6 +26,9 @@
 #include <string>
 #include <array>
 #include <functional>
+#include <iostream>
+#include <cmath>
+#include <cfenv>
 
 // Ignore the intellisense error "cannot open source file" for .shh files.
 // They will be created during the build sequence before the preprocessor runs.
@@ -434,7 +437,8 @@ void Graphics::DrawTriangleTex( const TexVertex& v0,const TexVertex& v1,const Te
 	const TexVertex* pv1 = &v1;
 	const TexVertex* pv2 = &v2;
 
-	// sorting vertices by y
+	// sorting vertices by y, tex vertex same but has a memeber attribute of pos to store the actual vertex and the texture coordinates
+	// as the other one 
 	if( pv1->pos.y < pv0->pos.y ) std::swap( pv0,pv1 );
 	if( pv2->pos.y < pv1->pos.y ) std::swap( pv1,pv2 );
 	if( pv1->pos.y < pv0->pos.y ) std::swap( pv0,pv1 );
@@ -457,6 +461,9 @@ void Graphics::DrawTriangleTex( const TexVertex& v0,const TexVertex& v1,const Te
 		const float alphaSplit =
 			(pv1->pos.y - pv0->pos.y) /
 			(pv2->pos.y - pv0->pos.y);
+		/* you remember this just finding the ratio between the points to calculate the splitting vertex to determine what sort of
+			triangle we are working with.
+		*/
 		const TexVertex vi = pv0->InterpolateTo( *pv2,alphaSplit );
 
 		if( pv1->pos.x < vi.pos.x ) // major right
@@ -575,7 +582,7 @@ void Graphics::DrawFlatBottomTriangle( const Vec2& v0,const Vec2& v1,const Vec2&
 
 void Graphics::DrawFlatTopTriangleTex( const TexVertex& v0,const TexVertex& v1,const TexVertex& v2,const Surface& tex )
 {
-	// calulcate dVertex / dy
+	// calulcate dVertex / dy, as in the slope ay
 	const float delta_y = v2.pos.y - v0.pos.y;
 	const TexVertex dv0 = (v2 - v0) / delta_y;
 	const TexVertex dv1 = (v2 - v1) / delta_y;

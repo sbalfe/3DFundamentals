@@ -2,7 +2,7 @@
 
 #include "Vec2.h"
 #include "Vec3.h"
-
+#include <iostream>
 class TexVertex
 {
 public:
@@ -10,7 +10,9 @@ public:
 		:
 		pos( pos ),
 		tc( tc )
-	{}
+	{
+		
+	}
 	/* interpolation between 2 texture vertices */
 	TexVertex InterpolateTo( const TexVertex& dest,float alpha ) const
 	{

@@ -16,6 +16,12 @@ public:
 		const float side = size / 2.0f;
 		const auto ConvertTexCoord = []( float u,float v )
 		{
+			/* 
+				shift it up 1 to remove the negative one values
+				divide by 3 and 4 as this is the shape of the texture passed in
+
+				ranging from 0,0 0,4 on the long edge , adn -1,1 > 2,1 on the cross of the cube unwrapped
+			*/
 			return Vec2{ (u + 1.0f) / 3.0f,v / 4.0f };
 		};
 

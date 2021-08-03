@@ -11,6 +11,21 @@ class CubeFoldedWrap
 public:
 	CubeFoldedWrap( float size )
 	{
+		/*
+			with wrapping the cube we can have coordinats that are beyond 1 etc as they just query 
+
+			the same texture but in a different offset of the actual triangle we are placing it in
+
+			to create a duplication effect. 
+
+			removes the mirroring effect
+
+			we can now create a skin for this using a png image of the same shape
+
+			example for our cube we can get a dice picture and unwrap it into each side
+
+			and use this to query our texture
+		*/
 		const float side = size / 2.0f;
 		vertices.emplace_back( -side,-side,-side ); // 0
 		tc.emplace_back( 1.0f,0.0f );

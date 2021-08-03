@@ -12,6 +12,12 @@ class CubeFolded
 public:
 	CubeFolded( float size )
 	{
+		/*
+			we have folded the cube opeen , using the same vertex in some case
+
+			but improves the application of our textures as they have a complete query space
+			to obtain the entire texture that was required.
+		*/
 		const float side = size / 2.0f;
 		vertices.emplace_back( -side,-side,-side ); // 0
 		tc.emplace_back( 1.0f,0.0f );

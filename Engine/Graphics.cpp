@@ -583,11 +583,20 @@ void Graphics::DrawFlatBottomTriangle( const Vec2& v0,const Vec2& v1,const Vec2&
 void Graphics::DrawFlatTopTriangleTex( const TexVertex& v0,const TexVertex& v1,const TexVertex& v2,const Surface& tex )
 {
 	// calulcate dVertex / dy, as in the slope ay
+
+	/*
+		so tex vertex class contains the information on the position the texture coordinate present there.
+
+		not just change in u / v
+
+		also change in x / y, for each change in y > should be 1 of course.
+	*/
 	const float delta_y = v2.pos.y - v0.pos.y;
 	const TexVertex dv0 = (v2 - v0) / delta_y;
 	const TexVertex dv1 = (v2 - v1) / delta_y;
 
-	// create right edge interpolant
+	// create right edge interpolant, if u draw a flat top triangle , remeber that goes from v1 in top left, v0 top right, v2 bottom
+	// therefore interpolate from v1
 	TexVertex itEdge1 = v1;
 
 	// call the flat triangle render routine
@@ -596,12 +605,16 @@ void Graphics::DrawFlatTopTriangleTex( const TexVertex& v0,const TexVertex& v1,c
 
 void Graphics::DrawFlatBottomTriangleTex( const TexVertex& v0,const TexVertex& v1,const TexVertex& v2,const Surface& tex )
 {
-	// calulcate dVertex / dy
+	// calulcate dVertex / dy- 
 	const float delta_y = v2.pos.y - v0.pos.y;
+	/*
+		
+	*/
 	const TexVertex dv0 = (v1 - v0) / delta_y;
 	const TexVertex dv1 = (v2 - v0) / delta_y;
 
-	// create right edge interpolant
+	// create right edge interpolant, dont need left as its the same value of course
+	// the top value is v0 as this is the top vertex thus the value we interpolate our texture from
 	TexVertex itEdge1 = v0;
 
 	// call the flat triangle render routine
@@ -611,38 +624,73 @@ void Graphics::DrawFlatBottomTriangleTex( const TexVertex& v0,const TexVertex& v
 void Graphics::DrawFlatTriangleTex( const TexVertex& v0,const TexVertex& v1,const TexVertex& v2,const Surface& tex,
 									const TexVertex& dv0,const TexVertex& dv1,TexVertex& itEdge1 )
 {
-	// create edge interpolant for left edge (always v0)
+	// create edge interpolant for left edge (always v0), this is passed in as being the right edge one
 	TexVertex itEdge0 = v0;
 
 	// calculate start and end scanlines
 	const int yStart = (int)ceil( v0.pos.y - 0.5f );
 	const int yEnd = (int)ceil( v2.pos.y - 0.5f ); // the scanline AFTER the last line drawn
 	
-	// do interpolant prestep
+	// do interpolant prestep, recall itEdge is a combination of tex and pos, so they are both prestepped
+	// rather than just using the x and y of triangle to determine texture prestep.
+	// this includes the delta value which saves the need for interpolating the delta to find the pre step later.
 	itEdge0 += dv0 * (float( yStart ) + 0.5f - v0.pos.y);
 	itEdge1 += dv1 * (float( yStart ) + 0.5f - v0.pos.y);
 
-	// init tex width/height and clamp values
+	// init tex width/height and clamp values. prevent us exiting the bounds of the texture 
 	const float tex_width = float( tex.GetWidth() );
 	const float tex_height = float( tex.GetHeight() );
+
+	/* clamp to prevent us reading beyond the current memory of the texture coordinates that we have */
 	const float tex_clamp_x = tex_width - 1.0f;
 	const float tex_clamp_y = tex_height - 1.0f;
 
 	for( int y = yStart; y < yEnd; y++,itEdge0 += dv0,itEdge1 += dv1 )
 	{
-		// calculate start and end pixels
+		// calculate start and end pixels, the gradient is considered in the interpolant already so just need to ceil it -1/2 like normal
 		const int xStart = (int)ceil( itEdge0.pos.x - 0.5f );
 		const int xEnd = (int)ceil( itEdge1.pos.x - 0.5f ); // the pixel AFTER the last pixel drawn
 		
-		// calculate scanline dTexCoord / dx
+		// calculate scanline dTexCoord / dx, change in the scanline distance when entering in the pixels.
 		const Vec2 dtcLine = (itEdge1.tc - itEdge0.tc) / (itEdge1.pos.x - itEdge0.pos.x);
 
 		// create scanline tex coord interpolant and prestep
+
+		/*
+			create the initial coordinate 
+
+			add on the top left edge of the texture corodinate
+
+			thena add to this the standardised step distance in hte texture from the scanline ratio, 
+			ratio of change in triangle to change in texture, as in move 1 in trianlge moves 0.2 in texture.
+
+			so this just creates the prestep , as the last bit is where the x actually starts
+
+			recall that this just finds the pixel to start on the scanline , in this case returns how far it actually moved from the intial x as itedg0.pos.x
+			therefore used to show how much we have to prestep into the texture
+		
+			we interpolate just the texture coordinates values as there is no need for the triangle to be involved
+		*/
 		Vec2 itcLine = itEdge0.tc + dtcLine * (float( xStart ) + 0.5f - itEdge0.pos.x);
+
+
 
 		for( int x = xStart; x < xEnd; x++,itcLine += dtcLine )
 		{
+
+			/*
+				place in the coordiantes, however query the color at the specified position
+
+				it cannot be smaller than the clamp coordinates as specified by the min values.
+
+				otherwise its simply just an integer value of x and y to obtain the color at that locaiton in the texture map
+			*/
 			PutPixel( x,y,tex.GetPixel( 
+				/*
+					multiply the x/y by width and height respectively to query the proper texture coordinatee
+
+					as the itcLine here in NDC as in between 0 and 1.
+				*/
 				int( std::min( itcLine.x * tex_width,tex_clamp_x ) ),
 				int( std::min( itcLine.y * tex_height,tex_clamp_y ) ) ) );
 			// need std::min b/c tc.x/y == 1.0, we'll read off edge of tex
@@ -714,6 +762,12 @@ void Graphics::DrawFlatTriangleTexWrap( const TexVertex& v0,const TexVertex& v1,
 		for( int x = xStart; x < xEnd; x++,itcLine += dtcLine )
 		{
 			PutPixel( x,y,tex.GetPixel(
+
+				/* only difference in wrap is fmod, computes floating point remained
+					so if the value reaches the clamp x coordiante then just loop back to the 
+					start of the coordinates, returns coordiante at the start of the buffer for the texture map.
+					if we reach 1 then it wraps back obv as u can always divide by 1 to obtain 0 remainder
+				*/
 				int( std::fmod( itcLine.x * tex_width,tex_clamp_x ) ),
 				int( std::fmod( itcLine.y * tex_height,tex_clamp_y ) ) ) );
 			// need std::min b/c tc.x/y == 1.0, we'll read off edge of tex

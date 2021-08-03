@@ -150,7 +150,7 @@ private:
 	// sends generated triangle to post-processing
 	void ProcessTriangle( const Vertex& v0,const Vertex& v1,const Vertex& v2 )
 	{
-		// generate triangle from 3 vertices using gs
+		// generate triangle from 3 vertices using gs, triangle is just a class to hold 3 vertices that represent the triangle.
 		// and send to post-processing
 		PostProcessTriangleVertices( Triangle<Vertex>{ v0,v1,v2 } );
 	}
@@ -158,7 +158,7 @@ private:
 	// perform perspective and viewport transformations
 	void PostProcessTriangleVertices( Triangle<Vertex>& triangle )
 	{
-		// perspective divide and screen transform for all 3 vertices
+		// perspective divide and screen transform for all 3 vertices, from NDC > SCREEN SPACE recall.
 		pst.Transform( triangle.v0.pos );
 		pst.Transform( triangle.v1.pos );
 		pst.Transform( triangle.v2.pos );
@@ -208,6 +208,9 @@ private:
 
 			if( pv1->pos.x < vi.pos.x ) // major right
 			{
+				/* major right is just where v1 is on the left, and major left on the right if u draw a triangle
+					which is not a perfect inline flat bottom or flat top. 
+				*/
 				DrawFlatBottomTriangle( *pv0,*pv1,vi );
 				DrawFlatTopTriangle( *pv1,vi,*pv2 );
 			}

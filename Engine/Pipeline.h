@@ -75,6 +75,7 @@ public:
 			return Vertex( *this ) /= rhs;
 		}
 	public:
+		/* draw takes in a position vec3 and a texture coordinate vec2 to query the color from. */
 		Vec3 pos;
 		Vec2 t;
 	};
@@ -85,6 +86,10 @@ public:
 	{}
 	void Draw( IndexedTriangleList<Vertex>& triList )
 	{
+		/* process takes in the vertices and indices from the triangle list seperately.
+			
+			this is the vertex transformer in our pipeline essentially.
+		*/
 		ProcessVertices( triList.vertices,triList.indices );
 	}
 	void BindRotation( const Mat3& rotation_in )
@@ -104,10 +109,11 @@ private:
 	// transforms vertices and then passes vtx & idx lists to triangle assembler
 	void ProcessVertices( const std::vector<Vertex>& vertices,const std::vector<size_t>& indices )
 	{
-		// create vertex vector for vs output
+		// create vertex vector for vs output, each vertex is transformed and its output is stored here.
 		std::vector<Vertex> verticesOut;
 
-		// transform vertices using matrix + vector
+		// transform vertices using matrix + vector, apply the rotation and translation matrix / vector which creates the positions 
+		// to correct space
 		for( const auto& v : vertices )
 		{
 			verticesOut.emplace_back( v.pos * rotation + translation,v.t );
@@ -116,12 +122,14 @@ private:
 		// assemble triangles from stream of indices and vertices
 		AssembleTriangles( verticesOut,indices );
 	}
+
 	// triangle assembly function
 	// assembles indexed vertex stream into triangles and passes them to post process
 	// culls (does not send) back facing triangles
 	void AssembleTriangles( const std::vector<Vertex>& vertices,const std::vector<size_t>& indices )
 	{
-		// assemble triangles in the stream and process
+		// assemble triangles in the stream and process, divide by 3 as the indices are in chunks of 3 
+		// to query each vertex.
 		for( size_t i = 0,end = indices.size() / 3;
 			 i < end; i++ )
 		{

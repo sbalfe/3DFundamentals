@@ -12,9 +12,11 @@ public:
 		vertices( std::move( verts_in ) ),
 		indices( std::move( indices_in ) )
 	{
+		/* checks that they are valid for representing a triangle, if not then throw compiler error. */
 		assert( vertices.size() > 2 );
 		assert( indices.size() % 3 == 0 );
 	}
+	/* creates the vertices and indice in one object */
 	std::vector<T> vertices;
 	std::vector<size_t> indices;
 };

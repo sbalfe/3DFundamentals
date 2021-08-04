@@ -92,14 +92,20 @@ public:
 		*/
 		ProcessVertices( triList.vertices,triList.indices );
 	}
+
+	/* bind how we want to rotate*/
 	void BindRotation( const Mat3& rotation_in )
 	{
 		rotation = rotation_in;
 	}
+
+	/* bind how we want to translate*/
 	void BindTranslation( const Vec3& translation_in )
 	{
 		translation = translation_in;
 	}
+
+	/* and of course bind the smelly texture to render */
 	void BindTexture( const std::wstring& filename )
 	{
 		pTex = std::make_unique<Surface>( Surface::FromFile( filename ) );
@@ -211,11 +217,28 @@ private:
 				/* major right is just where v1 is on the left, and major left on the right if u draw a triangle
 					which is not a perfect inline flat bottom or flat top. 
 				*/
+				/*
+					flat bottom major right
+
+					top is v0, bottom left is v1 and bottom right is v1
+
+					flat top major right
+
+					top are v1 and vi with vi on the left > passed in as v1
+
+					v2 on the bottom ofc
+				*/
 				DrawFlatBottomTriangle( *pv0,*pv1,vi );
 				DrawFlatTopTriangle( *pv1,vi,*pv2 );
 			}
 			else // major left
 			{
+
+				/*
+					flat bottom major switches the vi and v1 for the left and right bottom values
+
+					flat top major left switches the vi and v1 values for the one at top
+				*/
 				DrawFlatBottomTriangle( *pv0,vi,*pv1 );
 				DrawFlatTopTriangle( vi,*pv1,*pv2 );
 			}
@@ -229,10 +252,22 @@ private:
 		// calulcate dVertex / dy
 		// change in interpolant for every 1 change in y
 		const float delta_y = it2.pos.y - it0.pos.y;
+
+		/*
+			
+			it2 always v2 bottom vertex, which is above used to obtain change in y from top to bottom of triangle
+
+			this value is used with the tex/pos it2 , it0 (vi /v1), it1 (v1,vi) depending on major left major right
+
+			this value is using the / which just divides the 3d coordinates by the change in y from both sides to obtain 
+
+			a ratio to use for the texture
+		
+		*/
 		const auto dit0 = (it2 - it0) / delta_y;
 		const auto dit1 = (it2 - it1) / delta_y;
 
-		// create right edge interpolant
+		// create right edge interpolant, this is either v1 or vi depending on major right or major left
 		auto itEdge1 = it1;
 
 		// call the flat triangle render routine
@@ -245,11 +280,13 @@ private:
 	{
 		// calulcate dVertex / dy
 		// change in interpolant for every 1 change in y
+		// this is flat bottom therefore considesr the interpolant distance between top vertex 0 
 		const float delta_y = it2.pos.y - it0.pos.y;
-		const auto dit0 = (it1 - it0) / delta_y;
-		const auto dit1 = (it2 - it0) / delta_y;
+		const auto dit0 = (it1 - it0) / delta_y; // how much a change in the coordiantes of our triangle moves a unit in the texture for the it1 side
+		const auto dit1 = (it2 - it0) / delta_y; // same idea for it2 sde
 
-		// create right edge interpolant
+		// create right edge interpolant, this is the edge which is the top which is common and therefore we interpolate our values from this
+		// this would be it1 in the other
 		auto itEdge1 = it0;
 
 		// call the flat triangle render routine
@@ -264,7 +301,7 @@ private:
 						   const Vertex& dv1,
 						   Vertex itEdge1 )
 	{
-		// create edge interpolant for left edge (always v0)
+		// create edge interpolant for left edge (always v0), this can either be vi, v1 actually
 		auto itEdge0 = it0;
 
 		// calculate start and end scanlines
@@ -296,13 +333,15 @@ private:
 			const float dx = itEdge1.pos.x - itEdge0.pos.x;
 			const auto diLine = (itEdge1 - iLine) / dx;
 
-			// prestep scanline interpolant
+			// prestep scanline interpolant, this interpolates the entire vertex tex / pos coordinates.
 			iLine += diLine * (float( xStart ) + 0.5f - itEdge0.pos.x);
 
 			for( int x = xStart; x < xEnd; x++,iLine += diLine )
 			{
 				// perform texture lookup, clamp, and write pixel
 				gfx.PutPixel( x,y,pTex->GetPixel(
+					/* query the x , y based on how far in the tex x /y is times by tex width/ height to get real coordinat on the texture */
+					/* this texture coordinate is passed in as 0 1 thereforee just find the exact coordinate from its pre normalized state*/
 					(unsigned int)std::min( iLine.t.x * tex_width + 0.5f,tex_xclamp ),
 					(unsigned int)std::min( iLine.t.y * tex_height + 0.5f,tex_yclamp )
 				) );

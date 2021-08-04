@@ -83,7 +83,8 @@ public:
 				(unsigned int)std::min( in.t.x * tex_width + 0.5f,tex_xclamp ),
 				(unsigned int)std::min( in.t.y * tex_height + 0.5f,tex_yclamp )
 			);
-		}
+		} 
+		/* this specific pixel shader has a bind texture function attached to it */
 		void BindTexture( const std::wstring& filename )
 		{
 			pTex = std::make_unique<Surface>( Surface::FromFile( filename ) );

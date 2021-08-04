@@ -14,7 +14,7 @@ template<class Effect>
 class Pipeline
 {
 public:
-	// vertex type used for geometry and throughout pipeline
+	// vertex type used for geometry and throughout pipeline, defines a special type to pass down the pipeline
 	typedef typename Effect::Vertex Vertex;
 public:
 	Pipeline( Graphics& gfx )

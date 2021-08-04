@@ -85,6 +85,7 @@ private:
 	void PostProcessTriangleVertices( Triangle<Vertex>& triangle )
 	{
 		// perspective divide and screen transform for all 3 vertices
+		// processs all the vertices rather than just position by itself.
 		pst.Transform( triangle.v0 );
 		pst.Transform( triangle.v1 );
 		pst.Transform( triangle.v2 );
@@ -219,12 +220,18 @@ private:
 
 			for( int x = xStart; x < xEnd; x++,iLine += diLine )
 			{
+
+				/*
+					whole idea of perspesctive correction is passing the tex/pos to be interolated linearly
+					within the same transform space and here its just converting the inverse back to normal
+					and multiplying out by z to obtain the proper z value
+				*/
 				// recover interpolated z from interpolated 1/z
 				const float z = 1.0f / iLine.pos.z;
 				// recover interpolated attributes
 				// (wasted effort in multiplying pos (x,y,z) here, but
 				//  not a huge deal, not worth the code complication to fix)
-				const auto attr = iLine * z;
+				const auto attr = iLine * z;, // after converting to z, this just multiplies the original values to obtain the correct interpolate attributes
 				// invoke pixel shader with interpolated vertex attributes
 				// and use result to set the pixel color on the screen
 				gfx.PutPixel( x,y,effect.ps( attr ) );

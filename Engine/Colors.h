@@ -48,6 +48,7 @@ public:
 		:
 		Color( (x << 24u) | col.dword )
 	{}
+	/* must be a vec3 , as stated by explicit*/
 	explicit Color( const Vec3& cf )
 		:
 		Color( unsigned char( cf.x ),unsigned char( cf.y ),unsigned char( cf.z ) )

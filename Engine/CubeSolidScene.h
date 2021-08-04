@@ -24,6 +24,9 @@ public:
 
 		for( int i = 0; i < itlist.vertices.size(); i++ )
 		{
+			/* divide int by 4 as the index remains index for all 4 vertices to query the color 4 times 
+				for all the vertices.
+			*/
 			itlist.vertices[i].color = colors[i / 4];
 		}
 	}

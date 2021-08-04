@@ -44,6 +44,10 @@ private:
 		// transform vertices using matrix + vector
 		for( const auto& v : vertices )
 		{
+			/* generate a texture which has a copy constructo built for it
+				to take in v and extract its color for use as some textures
+				do contain the texture coordiante thereforee this section would not work.
+			*/
 			verticesOut.emplace_back( v.pos * rotation + translation,v );
 		}
 
@@ -225,6 +229,7 @@ private:
 		}
 	}
 public:
+	/* effect holds the entire array of shaders in our program.*/
 	Effect effect;
 private:
 	Graphics& gfx;

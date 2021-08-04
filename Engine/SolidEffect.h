@@ -2,7 +2,7 @@
 
 #include "Pipeline.h"
 
-// solid color attribute not interpolated
+// solid color attribute not interpolated, this is for flat colours which need no interpolation
 class SolidEffect
 {
 public:
@@ -63,6 +63,7 @@ public:
 		}
 	public:
 		Vec3 pos;
+		/* theres no interpolation its just a constant color at initilization */
 		Color color;
 	};
 	// invoked for each pixel of a triangle

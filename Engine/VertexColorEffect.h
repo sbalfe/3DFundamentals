@@ -15,11 +15,16 @@ public:
 			:
 			pos( pos )
 		{}
+		/* creates a copy constructor for the vertices out part of the pipeline
+			which extracts the color out of it to obtain the color effect for it
+			
+		*/
 		Vertex( const Vec3& pos,const Vertex& src )
 			:
 			color( src.color ),
 			pos( pos )
 		{}
+		
 		Vertex( const Vec3& pos,const Vec3& color )
 			:
 			color( color ),
@@ -66,7 +71,10 @@ public:
 			return Vertex( *this ) /= rhs;
 		}
 	public:
+		/* the member of color must be interpolated for this vertex color effect to work.*/
 		Vec3 pos;
+
+		/* stores R,G,B Vec3 255*/
 		Vec3 color;
 	};
 	// invoked for each pixel of a triangle

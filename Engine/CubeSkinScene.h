@@ -10,7 +10,9 @@
 class CubeSkinScene : public Scene
 {
 public:
+	/* pipeline is now templated to hold shaders and textures , alongside vertex being a part of */
 	typedef Pipeline<TextureEffect> Pipeline;
+	/* calls the vertex in the pipeline which in itself is calling the effect vertex*/
 	typedef Pipeline::Vertex Vertex;
 public:
 	CubeSkinScene( Graphics& gfx,const std::wstring& filename )
@@ -19,6 +21,7 @@ public:
 		pipeline( gfx ),
 		Scene( "Textured Cube skinned using texture: " + std::string( filename.begin(),filename.end() ) )
 	{
+		/* this is now added to the pipeline shader of bind texture*/
 		pipeline.effect.ps.BindTexture( filename );
 	}
 	virtual void Update( Keyboard& kbd,Mouse& mouse,float dt ) override

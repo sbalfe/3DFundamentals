@@ -69,6 +69,7 @@ public:
 		Vec3 pos;
 		Vec2 t;
 	};
+
 	// invoked for each pixel of a triangle
 	// takes an input of attributes that are the
 	// result of interpolating vertex attributes

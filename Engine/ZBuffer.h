@@ -24,6 +24,7 @@ public:
 		const int nDepths = width * height;
 		for( int i = 0; i < nDepths; i++ )
 		{
+			/* initially the z buffer is infinity as there is no pixel present there.*/
 			pBuffer[i] = std::numeric_limits<float>::infinity();
 		}
 	}
@@ -35,6 +36,7 @@ public:
 		assert( y < height );
 		return pBuffer[y * width + x];
 	}
+	/* const the function that is used for const values of int x and y to ensure they are not changed.*/
 	const float& At( int x,int y ) const
 	{
 		return const_cast<ZBuffer*>(this)->At( x,y );

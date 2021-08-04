@@ -79,7 +79,7 @@ public:
 		template<class Input>
 		Color operator()( const Input& in ) const
 		{
-			return Color( in.color );
+			return Color(-5,-5,-5);
 		}
 	};
 public:

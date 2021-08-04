@@ -58,6 +58,7 @@ public:
 	}
 	virtual void Draw() override
 	{
+		/* clear the z buffer before every start */
 		pipeline.BeginFrame();
 		// generate rotation matrix from euler angles
 		// translation from offset

@@ -21,6 +21,7 @@ public:
 	Pipeline( Graphics& gfx )
 		:
 		gfx( gfx ),
+		/* init our z buffer for depth testing , of course same size as screen  */
 		zb( gfx.ScreenWidth,gfx.ScreenHeight )
 	{}
 	void Draw( IndexedTriangleList<Vertex>& triList )
@@ -230,7 +231,7 @@ private:
 				const float z = 1.0f / iLine.pos.z;
 				// do z rejection / update of z buffer
 				// skip shading step if z rejected (early z)
-				if( zb.TestAndSet( x,y,z ) )
+				if( zb.TestAndSet( x,y,z ) )  /* this increase performances*/
 				{
 					// recover interpolated attributes
 					// (wasted effort in multiplying pos (x,y,z) here, but

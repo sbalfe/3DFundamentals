@@ -2,7 +2,7 @@
 
 #include "Pipeline.h"
 #include "DefaultGeometryShader.h"
-
+#include <cmath>
 class WaveVertexTextureEffect
 {
 public:
@@ -86,7 +86,7 @@ public:
 		Output operator()( const Vertex& in ) const
 		{
 			Vec3 pos = in.pos * rotation + translation;
-			pos.y += amplitude * std::sin( time * freqScroll + pos.x * freqWave );
+			pos.y += amplitude * sin( time * freqScroll + pos.x * freqWave );
 			return{ pos,in.t };
 		}
 		void SetTime( float t )

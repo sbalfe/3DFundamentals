@@ -18,6 +18,13 @@ public:
 	// vertex type used for geometry and throughout pipeline
 	typedef typename Effect::Vertex Vertex;
 	typedef typename Effect::VertexShader::Output VSOut;
+
+	/* new output is geoemetry shader
+		new geometry shader calls passing in triangle vertices after 
+
+		geometry shader inserted as the input to post process triangles
+
+	*/
 	typedef typename Effect::GeometryShader::Output GSOut;
 public:
 	Pipeline( Graphics& gfx )
@@ -66,7 +73,7 @@ private:
 			// cull backfacing triangles with cross product (%) shenanigans
 			if( (v1.pos - v0.pos) % (v2.pos - v0.pos) * v0.pos <= 0.0f )
 			{
-				// process 3 vertices into a triangle
+				// process 3 vertices into a triangle, use i value as the triangle_index to be unique.
 				ProcessTriangle( v0,v1,v2,i );
 			}
 		}
@@ -78,6 +85,10 @@ private:
 	{
 		// generate triangle from 3 vertices using gs
 		// and send to post-processing
+
+		/* each triangle has some unique index linked to it which
+			the geometry shader can make use of
+		*/
 		PostProcessTriangleVertices( effect.gs( v0,v1,v2,triangle_index ) );
 	}
 	// vertex post-processing function

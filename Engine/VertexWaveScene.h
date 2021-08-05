@@ -17,7 +17,7 @@ public:
 public:
 	VertexWaveScene( Graphics& gfx )
 		:
-		itlist( Plane::GetSkinned<Vertex>( 20 ) ),
+		itlist( Plane::GetSkinned<Vertex>( 20) ),
 		pipeline( gfx ),
 		Scene( "Test Plane Rippling VS" )
 	{

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Pipeline.h"
-
+#include <iostream>
 class WaveVertexTextureEffect
 {
 public:
@@ -85,20 +85,44 @@ public:
 		Output operator()( const Vertex& in ) const
 		{
 			Vec3 pos = in.pos * rotation + translation;
-			pos.y += amplitude * std::sin( time * freqScroll + pos.x * freqWave );
+			/* 
+				imagine this as playing with a sin graph
+
+				multiply the original sin by an amplitidue to value to increase the overall wave effecct
+
+				freqWave * x means take find where the x position is and mu
+
+				time * freqScroll is the speed = distance/time
+				speed x time = distance > offset value for the sin function
+
+				freqWave * pos.x , imagine the sin function sin(x) on desmos, can make it 3 times more frequent using sin(3x)
+				add this onto the offset value based on speed to control to give the effect that 
+				there is a ripple through the plain as the sine wave of a set frequency 
+				moves over our vertices.
+
+				its on the viewport so remember up x, right y and into screen z
+
+				test with x y and z and it will make sense the wave
+
+				the wave essentially pushes each point in its corrsesponding direction based on the sin function
+
+			*/
+			pos.y+= amplitude * std::sin( (time * freqScroll) + pos.x * freqWave );
 			return{ pos,in.t };
 		}
 		void SetTime( float t )
+
 		{
 			time = t;
+		
 		}
 	private:
 		Mat3 rotation;
 		Vec3 translation;
 		float time = 0.0f;
 		float freqWave = 10.0f;
-		float freqScroll = 5.0f;
-		float amplitude = 0.05f;
+		float freqScroll = 10.0f;
+		float amplitude = 0.06f;
 	};
 	// texture clamped ps
 	class PixelShader

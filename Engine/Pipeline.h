@@ -17,7 +17,9 @@ class Pipeline
 public:
 	// vertex type used for geometry and throughout pipeline
 	typedef typename Effect::Vertex Vertex;
-	typedef typename Effect::VertexShader::Output VSOut;
+
+	/* the output type of the vertex shader can be variable essentially.*/
+	typedef typename Effect::VertexShader::Output VSOut; /* this is just the type that is output from our vertex shader */
 public:
 	Pipeline( Graphics& gfx )
 		:
@@ -41,7 +43,7 @@ private:
 		// create vertex vector for vs output
 		std::vector<VSOut> verticesOut( vertices.size() );
 
-		// transform vertices with vs
+		// transform vertices with vs, transform from start to finish to our effect.vs
 		std::transform( vertices.begin(),vertices.end(),
 						verticesOut.begin(),
 						effect.vs );

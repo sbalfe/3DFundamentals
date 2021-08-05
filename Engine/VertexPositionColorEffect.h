@@ -135,6 +135,12 @@ public:
 		}
 		Output operator()( const Vertex& in ) const
 		{
+			/* the colour is based on the position of the coordinate
+				between -1 and 1 mult by 255 to obtain the values of r g b
+				if less than 0 < defaults at 255
+
+				this is a form of procedural generation based on our vertices position. 
+			*/
 			const auto pos = in.pos * rotation + translation;
 			return{ pos,Vec3{ std::abs( pos.x ),std::abs( pos.y ),std::abs( pos.z ) } * 255.0f };
 		}

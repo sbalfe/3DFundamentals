@@ -20,11 +20,13 @@ public:
 		assert( vertices.size() > 2 );
 		assert( indices.size() % 3 == 0 );
 	}
+
+	/* load .o */
 	static IndexedTriangleList<T> Load( const std::string& filename )
 	{
 		IndexedTriangleList<T> tl;
 
-		// check first line of file to see if CCW winding comment exists
+		// check first line of file to see if CCW winding comment exists, make sure the winding
 		bool isCCW = false;
 		{
 			std::ifstream file( filename );
@@ -39,11 +41,20 @@ public:
 
 		// these will be filled by obj loading function
 		using namespace tinyobj;
+		
+		/* obtain attributes out of the obj */
 		attrib_t attrib;
+
+		/* store shapes collected and error string */
 		std::vector<shape_t> shapes;
 		std::string err;
 
 		// load/parse the obj file
+
+		/* pass in pointers to our items, gives place to stores atributes, shapes and errors
+			
+			alongside passing in the filename
+		*/
 		const bool ret = LoadObj( &attrib,&shapes,nullptr,&err,filename.c_str() );
 
 		// check for errors
@@ -68,6 +79,12 @@ public:
 		// iterate over individual vertices, construct Vec3s in OUR vector
 		for( int i = 0; i < attrib.vertices.size(); i += 3 )
 		{
+
+			/* the attrib is a struct holding normals , vertices and tex coordinates 
+				here we are just filling the attrib array with the vertices.
+
+				which has just loaded from .obj
+			*/
 			tl.vertices.emplace_back( Vec3{
 				attrib.vertices[i + 0],
 				attrib.vertices[i + 1],
@@ -78,13 +95,16 @@ public:
 		// extract index data
 		// obj file can contain multiple meshes, we assume just 1
 		const auto& mesh = shapes[0].mesh;
+
 		// mesh contains a std::vector of num_face_vertices (uchar)
 		// and a flat std::vector of indices. If all faces are triangles
 		// then for any face f, the first index of that faces is [f * 3n]
 		tl.indices.reserve( mesh.indices.size() );
+
+		/* vertices may be quads or polygons not just triangles*/
 		for( size_t f = 0; f < mesh.num_face_vertices.size(); f++ )
 		{
-			// make sure there are no non-triangle faces
+			// make sure there are no non-triangle faces, cull any that are not of course.
 			if( mesh.num_face_vertices[f] != 3u )
 			{
 				std::stringstream ss;
@@ -96,6 +116,8 @@ public:
 			// load set of 3 indices for each face into OUR index std::vector
 			for( size_t vn = 0; vn < 3u; vn++ )
 			{
+				/* load the indices from each face */
+				/* fetch the indices created every 3 along and increment with vn and f to access the correct array of them  */
 				const auto idx = mesh.indices[f * 3u + vn];
 				tl.indices.push_back( size_t( idx.vertex_index ) );
 			}
@@ -117,23 +139,35 @@ public:
 		{
 			// iterator type for iterating over vertices
 			typedef std::vector<T>::const_iterator Pit;
+
 			// it type for iterating over components of vertex
 			// (pointer is used to iterate over members of class here)
+
+			/* iterator over vertex elements */
 			typedef const float* Cit;
 			// functor that miniball uses to get element iter based on vertex iter
 			Cit operator()( Pit it ) const
 			{
+
+				// uses iterator float to access the y and z values
 				return &it->pos.x;
 			}
 		};
 
-		// solve the minimum bounding sphere
+		// solve the minimum bounding sphere, this is a ball that surrounds the object to calculate its centre
 		Miniball::Miniball<VertexAccessor> mb( 3,vertices.cbegin(),vertices.cend() );
 		// get center of min sphere
 		// result is a pointer to float[3] (what a shitty fuckin interface)
 		const auto pc = mb.center();
+
+		/* calculate the centre */
 		const Vec3 center = { *pc,*std::next( pc ),*std::next( pc,2 ) };
+
 		// adjust all vertices so that center of minimal sphere is at 0,0
+
+		/*
+			so taking the cente of of every vertex drags everything to be bound by that sphere
+		*/
 		for( auto& v : vertices )
 		{
 			v.pos -= center;
@@ -142,6 +176,7 @@ public:
 	float GetRadius() const
 	{
 		// find element with max distance from 0,0; that is our radius
+		// makes sense , the radius defined as whatever the further away vertex is , which is the bounding problem
 		return std::max_element( vertices.begin(),vertices.end(),
 				[]( const T& v0,const T& v1 )
 				{

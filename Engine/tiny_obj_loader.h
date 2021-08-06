@@ -219,6 +219,7 @@ typedef struct {
   std::vector<tag_t> tags;                       // SubD tag
 } mesh_t;
 
+/* can store multiple shapes here */
 typedef struct {
   std::string name;
   mesh_t mesh;
@@ -1414,6 +1415,11 @@ bool MaterialStreamReader::operator()(const std::string &matId,
   return true;
 }
 
+/* takes in a pointer to attrib_t which is just the vertices / textures / normals */
+
+/* takes in shapes as it can return multiple objects*/
+
+/* can take in m */
 bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
              std::vector<material_t> *materials, std::string *err,
              const char *filename, const char *mtl_basedir, bool trianglulate) {
@@ -1449,6 +1455,7 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
              bool triangulate) {
   std::stringstream errss;
 
+  
   std::vector<real_t> v;
   std::vector<real_t> vn;
   std::vector<real_t> vt;

@@ -172,6 +172,8 @@ public:
 			float l;
 		};
 	public:
+
+		/* add lighting calculations to each triangle vertex. this is flat shading */
 		Triangle<Output> operator()( const VertexShader::Output& in0,const VertexShader::Output& in1,const VertexShader::Output& in2,size_t triangle_index ) const
 		{
 			// calculate face normal
@@ -219,6 +221,9 @@ public:
 			) );
 			// use texture color as material to determine ratio / magnitude
 			// of the different color components diffuse reflected from triangle at this pt.
+			// dynamic lighting as it combines the lighting values with the texture to obtai dynamic lighting
+			// as hte sine wave travels over the plane , it recalculates the normals and colors on the fly
+			// thus returning a varying colour value in strength
 			return Color( color * in.l );
 		}
 		void BindTexture( const std::wstring& filename )

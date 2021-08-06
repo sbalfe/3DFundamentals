@@ -129,8 +129,11 @@ public:
 	public:
 		Triangle<Output> operator()( const VertexShader::Output& in0,const VertexShader::Output& in1,const VertexShader::Output& in2,size_t triangle_index ) const
 		{
-			// calculate face normal
+			// calculate face normal, this is just  the cross product
+			// ensure we normalize it also to obtain efficient calculations
 			const auto n = ((in1.pos - in0.pos) % (in2.pos - in0.pos)).GetNormalized();
+
+			// perform same light calculations but at the geometry shader, removing need for special vertex shader.
 			// calculate intensity based on angle of incidence
 			const auto d = diffuse * std::max( 0.0f,-n * dir );
 			// add diffuse+ambient, filter by material color, saturate and scale

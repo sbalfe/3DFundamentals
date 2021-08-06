@@ -18,8 +18,11 @@ public:
 		pipeline( gfx ),
 		Scene( "flat geometry scene free mesh" )
 	{
+
+		/* bound center to sphere*/
 		itlist.AdjustToTrueCenter();
-		offset_z = itlist.GetRadius() * 1.6f;
+		/* offset it to be just within the window and not going outside.*/
+		offset_z = itlist.GetRadius();
 	}
 	virtual void Update( Keyboard& kbd,Mouse& mouse,float dt ) override
 	{

@@ -362,7 +362,8 @@ namespace Miniball {
     // Algorithm 2: pivot_mb (L_{n-1}), where L_{n-1} = [L.begin, n)  
     // --------------------------------------------------------------
     // from B. Gaertner, Fast and Robust Smallest Enclosing Balls, ESA 1999,
-    // http://www.inf.ethz.ch/personal/gaertner/texts/own_work/esa99_final.pdf  
+    // http://www.inf.ethz.ch/personal/gaertner/texts/own_work/esa99_final.pdf 
+    // https://people.inf.ethz.ch/gaertner/subdir/texts/own_work/seb.pdf
     NT          old_sqr_r;
     const NT*   c;
     Pit         pivot, k;

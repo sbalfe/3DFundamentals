@@ -189,6 +189,10 @@ public:
 				const auto idx = mesh.indices[f * 3u + vn];
 				tl.indices.push_back( size_t( idx.vertex_index ) );
 				// write normals into the vertices
+
+				/* tiny obj loader holds the normla coordiantes in adjacent positions in the list
+					retarded af but ay
+					*/
 				tl.vertices[(size_t)idx.vertex_index].n = Vec3{
 					attrib.normals[3 * idx.normal_index + 0],
 					attrib.normals[3 * idx.normal_index + 1],

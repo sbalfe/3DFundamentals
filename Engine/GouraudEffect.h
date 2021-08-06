@@ -144,6 +144,13 @@ public:
 		{
 			translation = translation_in;
 		}
+		/* 
+			gourad effect by interpolating the colour
+				
+			this applies some color at the vertices which is interpolated automatically
+			
+			by our rasterizer. 
+		*/
 		Output operator()( const Vertex& v ) const
 		{
 			// calculate intensity based on angle of incidence

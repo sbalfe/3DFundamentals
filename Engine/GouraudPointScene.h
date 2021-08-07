@@ -11,6 +11,9 @@
 class GouraudPointScene : public Scene
 {
 public:
+	/* have two pipelines to render this scene , light indicator requires its own for the purpose of shaders. */
+
+	/* we want the global pipeline scope specified with ::*/
 	typedef ::Pipeline<GouraudPointEffect> Pipeline;
 	typedef ::Pipeline<SolidEffect> LightIndicatorPipeline;
 	typedef Pipeline::Vertex Vertex;
@@ -91,7 +94,10 @@ public:
 	}
 	virtual void Draw() override
 	{
-		pipeline.BeginFrame();
+		pipeline.BeginFrame(); /* only begin frame once for multiplem objects in the same scenes
+								as to keep the depth test values.
+
+							   */
 		// generate rotation matrix from euler angles
 		// translation from offset
 		const Mat3 rot =
@@ -99,6 +105,8 @@ public:
 			Mat3::RotationY( theta_y ) *
 			Mat3::RotationZ( theta_z );
 		const Vec3 trans = { 0.0f,0.0f,offset_z };
+
+		/* first render the plain to work with the light in the same scene  */
 		// set pipeline transform
 		pipeline.effect.vs.BindRotation( rot );
 		pipeline.effect.vs.BindTranslation( trans );
@@ -110,12 +118,16 @@ public:
 		// don't call beginframe on this pipeline b/c wanna keep zbuffer contents
 		// (don't like this assymetry but we'll live with it for now)
 		liPipeline.effect.vs.BindTranslation( { lpos_x,lpos_y,lpos_z } );
-		liPipeline.effect.vs.BindRotation( Mat3::Identity() );
+		liPipeline.effect.vs.BindRotation( Mat3::Identity() ); /* identity matrix, as sphers dont get rotated. */
 		liPipeline.Draw( lightIndicator );
 	}
 private:
 	IndexedTriangleList<Vertex> itlist;
+
+	/* obtain light indicator from the sphere plain class */
 	IndexedTriangleList<SolidEffect::Vertex> lightIndicator = Sphere::GetPlain<SolidEffect::Vertex>( 0.05f );
+
+	/* embedded shared pointer that is used to link up the objects in the scene to perform proper depth testing. */
 	std::shared_ptr<ZBuffer> pZb;
 	Pipeline pipeline;
 	LightIndicatorPipeline liPipeline;

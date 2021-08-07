@@ -147,13 +147,30 @@ public:
 			// transform mech vertex position before lighting calc
 			const auto pos = v.pos * rotation + translation;
 			// vertex to light data
+
+			/* calculate the vecto in direction of light pos and vertex position */
 			const auto v_to_l = light_pos - pos;
+
+			/* distance of this is just the magnitude called from .Lne*/
 			const auto dist = v_to_l.Len();
+
+			/* 
+				direction the vector normalized after its division by distance , dynamic direction determination
+				rather than static light before
+			*/
 			const auto dir = v_to_l / dist;
-			// calculate attenuation
+
+			// calculate attenuation, use this as a factor to scale down the diffuse light calculations
+			// making it darker as further and lighter as closer of course. 
 			const auto attenuation = 1.0f / 
-				(constant_attenuation + linear_attenuation * dist * quadradic_attenuation * sq( dist ));
+				(constant_attenuation + (linear_attenuation * dist) + (quadradic_attenuation * sq( dist )));
 			// calculate intensity based on angle of incidence and attenuation
+
+			/*
+				the direction is based on the vertex dynamically , no - normal as the direciton
+				is already pointing in the right direction as its just calculated by negating the position of the light
+				to the object , from teh perspective of a vertex, 
+			*/
 			const auto d = light_diffuse * attenuation * std::max( 0.0f,(v.n * rotation) * dir );
 			// add diffuse+ambient, filter by material color, saturate and scale
 			const auto c = material_color.GetHadamard( d + light_ambient ).Saturate() * 255.0f;
@@ -174,10 +191,17 @@ public:
 	private:
 		Mat3 rotation;
 		Vec3 translation;
+
+		/* 
+			rather than a direction, its just a position making it easy to traverse and light various environments in more 
+			realistic manner.
+		*/
 		Vec3 light_pos = { 0.0f,0.0f,0.5f };
 		Vec3 light_diffuse = { 1.0f,1.0f,1.0f };
 		Vec3 light_ambient = { 0.1f,0.1f,0.1f };
 		Vec3 material_color = { 0.8f,0.85f,1.0f };
+
+		/* inverse square law values (ax^2 + bx +c)^-1 to control intensity over distance values */
 		float linear_attenuation = 1.0f;
 		float quadradic_attenuation = 2.619f;
 		float constant_attenuation = 0.382f;

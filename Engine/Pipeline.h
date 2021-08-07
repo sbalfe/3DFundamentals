@@ -28,6 +28,8 @@ public:
 	Pipeline( Graphics& gfx,std::shared_ptr<ZBuffer> pZb_in )
 		:
 		gfx( gfx ),
+
+		/* reference move to the shared z buffer */
 		pZb( std::move( pZb_in ) )
 	{
 		assert( pZb->GetHeight() == gfx.ScreenHeight && pZb->GetWidth() == gfx.ScreenWidth );

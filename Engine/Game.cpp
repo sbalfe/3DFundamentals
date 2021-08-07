@@ -45,7 +45,7 @@ Game::Game( MainWindow& wnd )
 	scenes.push_back( std::make_unique<GouraudScene>( gfx,Sphere::GetPlainNormals<GouraudScene::Vertex>() ) );
 	scenes.push_back( std::make_unique<GeometryFlatScene>( gfx,Sphere::GetPlain<GeometryFlatScene::Vertex>() ) );
 	scenes.push_back( std::make_unique<VertexWaveScene>( gfx ) );
-	scenes.push_back( std::make_unique<GeometryFlatScene>( gfx,IndexedTriangleList<GeometryFlatScene::Vertex>::Load( "models\\bunny.obj" ) ) );
+	/*scenes.push_back( std::make_unique<GeometryFlatScene>( gfx,IndexedTriangleList<GeometryFlatScene::Vertex>::Load( "models\\bunny.obj" ) ) );
 	scenes.push_back( std::make_unique<GeometryFlatScene>( gfx,Cube::GetPlain<GeometryFlatScene::Vertex>() ) );
 	scenes.push_back( std::make_unique<CubeFlatIndependentScene>( gfx ) );
 	scenes.push_back( std::make_unique<CubeSolidGeometryScene>( gfx ) );
@@ -53,7 +53,7 @@ Game::Game( MainWindow& wnd )
 	scenes.push_back( std::make_unique<DoubleCubeScene>( gfx ) );
 	scenes.push_back( std::make_unique<CubeSkinScene>( gfx,L"images\\office_skin.jpg" ) );
 	scenes.push_back( std::make_unique<CubeVertexColorScene>( gfx ) );
-	scenes.push_back( std::make_unique<CubeSolidScene>( gfx ) );
+	scenes.push_back( std::make_unique<CubeSolidScene>( gfx ) );*/
 	curScene = scenes.begin();
 	OutputSceneName();
 }

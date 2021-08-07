@@ -134,23 +134,87 @@ public:
 		template<class Input>
 		Color operator()( const Input& in ) const
 		{
-			// re-normalize interpolated surface normal
+			// re-normalize interpolated surface normal, rather than calculate it each time within the function below
+
+			/*
+				makes length of surf norm become 1
+			*/
 			const auto surf_norm = in.n.GetNormalized();
+
 			// vertex to light data
+
+			/*
+				obtains the direction of world pos from light pos 
+
+				imagine this as the arrow from teh vertex to light position
+
+				world position is the original coordinates in 3D space not just 2D screen coordinates for dynamic frag shader shading 
+			*/
+
+			/* this normalizes the light position and world position to obtain*/
 			const auto v_to_l = light_pos - in.worldPos;
 			const auto dist = v_to_l.Len();
 			const auto dir = v_to_l / dist;
+
 			// calculate attenuation
 			const auto attenuation = 1.0f /
 				(constant_attenuation + linear_attenuation * dist + quadradic_attenuation * sq( dist ));
+
 			// calculate intensity based on angle of incidence and attenuation
 			const auto d = light_diffuse * attenuation * std::max( 0.0f,surf_norm * dir );
+
 			// reflected light vector
+
+			/*
+				take dot of light position onto our world pos vertex 
+
+				this dot is the projected value onto the surface normal plane
+				unit vector therefore just becomes length of projected plane (length of w)
+
+				multiply this by the normalized vector itself to obtain the w vector used in in the reflection angle calculation
+			*/
 			const auto w = surf_norm * (v_to_l * surf_norm);
+
+			/*
+				see ipad for derivation, chilli tutorial 16
+
+
+			*/
 			const auto r = w * 2.0f - v_to_l;
+
 			// calculate specular intensity based on angle between viewing vector and reflection vector, narrow with power function
+
+			/*
+				USE WORLD POS as its based on the eyes of us, i.e camera > the camera doesnt shift the world pos
+
+				use the normalized value of the point we render as our view is always at the current 0,0,0 with no camera at least
+			*/
+
+			/*
+				specular is a result of the light diffuse value i.e light color
+
+				being multiplied by the specular intensity to the power of std::max(0.0f, phi (angle between reflected vector and current world space frag)
+
+				flip r as the light is going into vertex , wheras the normalized world position points outwards
+
+				apply a specular intensity and specular power to alter how powerful this effect is, how sharp the cut off is, creates   more metallic
+				the higher it is
+
+				specular intensity is how powerful this brightness actually is.
+
+
+			*/
+
+			/*
+				specular power view on desmos as (cosx)^specular_power where cosx is the dot product
+
+				as you can see the drop off at values further away from 1 on low power fades and scatters more for a more matte look
+
+				wheras higher values drop off sooner at sharper angles leaving a more precise specular point good for metallic looks.
+			*/
 			const auto s = light_diffuse * specular_intensity * std::pow( std::max( 0.0f,-r.GetNormalized() * in.worldPos.GetNormalized() ),specular_power );
-			// add diffuse+ambient, filter by material color, saturate and scale
+			
+		// add diffuse+ambient, filter by material color, saturate and scale
 			return Color( material_color.GetHadamard( d + light_ambient + s ).Saturate() * 255.0f );
 		}
 		void SetDiffuseLight( const Vec3& c )
@@ -175,7 +239,7 @@ public:
 		float quadradic_attenuation = 2.619f;
 		float constant_attenuation = 0.382f;
 		// specular
-		float specular_power = 30.0f;
+		float specular_power = 200.0f;
 		float specular_intensity = 0.6f;
 	};
 public:

@@ -104,6 +104,7 @@ public:
 		public:
 			Vec3 pos;
 			Vec3 n;
+			/* stores the position before its transformed to screen space in the pos variable which is all messed up different values. */
 			Vec3 worldPos;
 		};
 	public:
@@ -118,6 +119,10 @@ public:
 		Output operator()( const Vertex& v ) const
 		{
 			const auto pos = v.pos * rotation + translation;
+
+			/* returns the world pos as just position but its not messed up by the screen transformer. */
+
+			/* only rotate normals of course as they must not be strecthed out. */
 			return{ pos,v.n * rotation,pos };
 		}
 	private:
@@ -137,8 +142,12 @@ public:
 		Color operator()( const Input& in ) const
 		{
 			// vertex to light data
+
+			
 			const auto v_to_l = light_pos - in.worldPos;
 			const auto dist = v_to_l.Len();
+
+			/* direction = normalized distance of vertex world coordinates and light coordinates. */
 			const auto dir = v_to_l / dist;
 			// calculate attenuation
 			const auto attenuation = 1.0f /

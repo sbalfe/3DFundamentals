@@ -41,8 +41,8 @@ Game::Game( MainWindow& wnd )
 	gfx( wnd )
 {
 	scenes.push_back( std::make_unique<PhongPointScene>( gfx,IndexedTriangleList<PhongPointScene::Vertex>::LoadNormals( "models\\suzanne.obj" ) ) );
-	scenes.push_back( std::make_unique<PhongPointScene>( gfx,Plane::GetNormals<PhongPointScene::Vertex>( 16 ) ) );
-	scenes.push_back( std::make_unique<GouraudPointScene>( gfx,Plane::GetNormals<GouraudPointScene::Vertex>( 16 ) ) );
+	scenes.push_back( std::make_unique<PhongPointScene>( gfx,Plane::GetNormals<PhongPointScene::Vertex>() ) );
+	scenes.push_back( std::make_unique<GouraudPointScene>( gfx,Plane::GetNormals<GouraudPointScene::Vertex>(30) ) );
 	scenes.push_back( std::make_unique<GouraudPointScene>( gfx,IndexedTriangleList<GouraudPointScene::Vertex>::LoadNormals( "models\\suzanne.obj" ) ) );
 	scenes.push_back( std::make_unique<GouraudScene>( gfx,IndexedTriangleList<GouraudScene::Vertex>::LoadNormals( "models\\suzanne.obj" ) ) );
 	scenes.push_back( std::make_unique<GouraudScene>( gfx,Sphere::GetPlainNormals<GouraudScene::Vertex>() ) );

@@ -102,6 +102,7 @@ public:
 		public:
 			Vec4 pos;
 			Vec4 n;
+			/* just used by fragment shader */
 			Vec3 worldPos;
 		};
 	public:

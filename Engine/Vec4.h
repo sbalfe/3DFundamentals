@@ -48,7 +48,7 @@ public:
 	//{
 	//	return sq( *this );
 	//}
-	//T		Len() const
+	//T		Len() const, w always 1 so no need
 	//{
 	//	return sqrt( LenSq() );
 	//}
@@ -145,7 +145,7 @@ public:
 	{
 		return !(*this == rhs);
 	}
-	// clamp to between 0.0 ~ 1.0
+	// clamp to between 0.0 ~ 1.0, we may want r,g,b,a
 	_Vec4&	Saturate()
 	{
 		x = std::min( 1.0f,std::max( 0.0f,x ) );

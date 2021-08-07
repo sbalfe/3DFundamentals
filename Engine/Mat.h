@@ -71,6 +71,7 @@ public:
 	}
 	static _Mat Identity()
 	{
+		/* compile time constexpr to determine which code should be ran here*/
 		if constexpr( S == 3 )
 		{
 			return {
@@ -203,6 +204,7 @@ public:
 	}
 	static _Mat Translation( T x,T y,T z )
 	{
+		/* direct uses row vectors therefore multiply across then downwards , placing x y z down there.*/
 		if constexpr( S == 4 )
 		{
 			return {

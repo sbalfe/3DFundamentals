@@ -101,10 +101,19 @@ public:
 			}
 		public:
 			Vec4 pos;
+
+			/*
+				normal can just be a vec3 
+			*/
 			Vec3 n;
 			Vec3 worldPos;
 		};
 	public:
+		/*
+			world matrix seperated from the projection matrix 
+
+			as this would mess up the normal in terms of stretches and scaling occuring 
+		*/
 		void BindWorld( const Mat4& transformation_in )
 		{
 			world = transformation_in;
@@ -122,6 +131,12 @@ public:
 		Output operator()( const Vertex& v ) const
 		{
 			const auto p4 = Vec4( v.pos );
+
+			/* apply projection matrix to the position , but just the world translation of w = 0 to ignore translation for normal
+				and of course world pos stays the same too 
+
+				world proj is of course just the total mapping from local to view space with perspective 
+			*/
 			return { p4 * worldProj,Vec4{ v.n,0.0f } * world,p4 * world };
 		}
 	private:

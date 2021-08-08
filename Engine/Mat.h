@@ -237,8 +237,21 @@ public:
 	{
 		if constexpr( S == 4 )
 		{
+			/*
+				convert to radinas the FOV angle 
+			*/
 			const auto fov_rad = fov * (T)PI / (T)180.0;
+
+			/*
+				calculates the width of the screen using trig
+			*/
 			const auto w = (T)1.0f / std::tan( fov_rad / (T)2.0 );
+
+			/*
+				do w * ar to obtain 1/h, which is what is used to scale the coordinate
+
+				e.g. y/h > 
+			*/
 			const auto h = w * ar;
 			return {
 				w,		(T)0.0,	(T)0.0,				(T)0.0,

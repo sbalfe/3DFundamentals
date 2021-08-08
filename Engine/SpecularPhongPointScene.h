@@ -93,7 +93,10 @@ public:
 	{
 		pipeline.BeginFrame();
 
-		const auto proj = Mat4::ProjectionHFOV( 100.0f,1.33333f,1.0f,10.0f );
+		// 1.33333333333333 is 4:3 aspect ratio
+		// 100 is FOV
+		// 1 and 10 are near and far view plane distance 
+		const auto proj = Mat4::ProjectionHFOV( 100.0f,1.33333f,10.0f,10.0f );
 		// set pipeline transform
 		pipeline.effect.vs.BindWorld(
 			Mat4::RotationX( theta_x ) *

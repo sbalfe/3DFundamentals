@@ -62,6 +62,8 @@ private:
 	// culls (does not send) back facing triangles
 	void AssembleTriangles( const std::vector<VSOut>& vertices,const std::vector<size_t>& indices )
 	{
+
+		/* apply our eye position, currently at  0,0  into the projection matrix to obtain the correct culling  */
 		const auto eyepos = Vec4{ 0.0f,0.0f,0.0f,1.0f } * effect.vs.GetProj();
 		// assemble triangles in the stream and process
 		for( size_t i = 0,end = indices.size() / 3;
@@ -72,6 +74,8 @@ private:
 			const auto& v1 = vertices[indices[i * 3 + 1]];
 			const auto& v2 = vertices[indices[i * 3 + 2]];
 			// cull backfacing triangles with cross product (%) shenanigans
+
+			/* vec3 */
 			if( (v1.pos - v0.pos) % (v2.pos - v0.pos) * Vec3(v0.pos - eyepos) <= 0.0f )
 			{
 				// process 3 vertices into a triangle
@@ -231,7 +235,7 @@ private:
 				// skip shading step if z rejected (early z)
 				if( pZb->TestAndSet( x,y,iLine.pos.z ) )
 				{
-					// recover interpolated z from interpolated 1/z
+					// recover interpolated z from interpolated 1/z, w here holds z's coordinate
 					const float w = 1.0f / iLine.pos.w;
 					// recover interpolated attributes
 					// (wasted effort in multiplying pos (x,y,z) here, but

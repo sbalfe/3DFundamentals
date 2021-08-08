@@ -92,6 +92,11 @@ private:
 	void ClipCullTriangle( Triangle<GSOut>& t )
 	{
 		// cull tests
+
+		// first 6 here are to see if all vertices are out of range
+		// recall that w is used as the boundaries but its not actually 1
+		// its in some clip space coordinate , where its normalized after clipping and culling
+		// this culls full vertices at the far plane, and thats it no geometrical clipping 
 		if( t.v0.pos.x > t.v0.pos.w &&
 			t.v1.pos.x > t.v1.pos.w &&
 			t.v2.pos.x > t.v2.pos.w )
@@ -130,6 +135,9 @@ private:
 		}
 
 		// clipping routines
+
+		// v0 is on the wrong side in this 1, v1 and v2 are not 
+		// this requires 2 seperate triangles of course.
 		const auto Clip1 = [this]( GSOut& v0,GSOut& v1,GSOut& v2 )
 		{
 			// calculate alpha values for getting adjusted vertices
@@ -142,6 +150,8 @@ private:
 			PostProcessTriangleVertices( Triangle<GSOut>{ v0a,v1,v2 } );
 			PostProcessTriangleVertices( Triangle<GSOut>{ v0b,v0a,v2 } );
 		};
+
+		// v0 and v1 are wrong side and v2 on the right side. 
 		const auto Clip2 = [this]( GSOut& v0,GSOut& v1,GSOut& v2 )
 		{
 			// calculate alpha values for getting adjusted vertices
@@ -155,8 +165,12 @@ private:
 		};
 
 		// near clipping tests
+
+		// check if the z vertex is on wrong side of near plane 
 		if( t.v0.pos.z < 0.0f )
 		{
+			// if v0 and v1 are both on the wrong side , via the previous cull test 
+			// we know that v2 is on the right side, and therfore perform clipping to it 
 			if( t.v1.pos.z < 0.0f )
 			{
 				Clip2( t.v0,t.v1,t.v2 );
@@ -303,6 +317,9 @@ private:
 
 		// calculate start and end scanlines
 		const int yStart = std::max( (int)ceil( it0.pos.y - 0.5f ),0 );
+		/*
+			prevnt from being at the top of the screen.
+		*/
 		const int yEnd = std::min( (int)ceil( it2.pos.y - 0.5f ),(int)Graphics::ScreenHeight - 1 ); // the scanline AFTER the last line drawn
 
 		// do interpolant prestep
@@ -312,7 +329,11 @@ private:
 		for( int y = yStart; y < yEnd; y++,itEdge0 += dv0,itEdge1 += dv1 )
 		{
 			// calculate start and end pixels
+
+			// prevent start from being less than the value 0 to perform an clipping effect 
 			const int xStart = std::max( (int)ceil( itEdge0.pos.x - 0.5f ),0 );
+
+			// prevent the end from being greater than the Side of screen of the screen 
 			const int xEnd = std::min( (int)ceil( itEdge1.pos.x - 0.5f ),(int)Graphics::ScreenWidth - 1 ); // the pixel AFTER the last pixel drawn
 
 			// create scanline interpolant startpoint

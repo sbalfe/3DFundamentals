@@ -87,10 +87,18 @@ public:
 
 		if( kbd.KeyIsPressed( 'W' ) )
 		{
+			/* W is forward therefore add 1 to Z */
+
+			/*
+				mulitply this scalar value by the inverse inverse , therefore current camera rotation value
+
+				then apply the changed in speed over pressing w each frame.
+			*/
 			cam_pos += Vec4{ 0.0f,0.0f,1.0f,0.0f } * !cam_rot_inv * cam_speed * dt;
 		}
 		if( kbd.KeyIsPressed( 'A' ) )
 		{
+			/* A left therefore negate x*/
 			cam_pos += Vec4{ -1.0f,0.0f,0.0f,0.0f } * !cam_rot_inv * cam_speed * dt;
 		}
 		if( kbd.KeyIsPressed( 'S' ) )
@@ -118,21 +126,65 @@ public:
 			cam_rot_inv = cam_rot_inv * Mat4::RotationZ( -cam_roll_speed * dt );
 		}
 
+		/*
+			check for any mouse events
+		*/
 		while( !mouse.IsEmpty() )
 		{
+			/*
+				read the event from the mouse 
+			*/
 			const auto e = mouse.Read();
+
+			/*
+				Left press down 
+			*/
 			switch( e.GetType() )
 			{
 			case Mouse::Event::Type::LPress:
+
+				/*
+					engage at th current position 
+				*/
 				mt.Engage( e.GetPos() );
 				break;
+			/*
+				let go of mouse therefore call release to disengage
+			*/
 			case Mouse::Event::Type::LRelease:
 				mt.Release();
 				break;
+
+			/*
+				if the mouse has been detected to have moved 
+			*/
 			case Mouse::Event::Type::Move:
+
+				/*
+					check to see if it has been clicked and held downwards
+				*/
 				if( mt.Engaged() )
 				{
+					/*
+						calculate the change which returns an x y coordinate to show where its new postion
+					*/
 					const auto delta = mt.Move( e.GetPos() );
+
+					/*
+					* multiply cam_rot_inv to apply a Y and X rotation of the delta value times the change in pixels
+					* for angle to obtain the angle that the mouse change actually equivalates to
+					* thus enabling a click and drag value
+					* its negative the values of x and y as to apply an inverse as that when you click and hold if u go right
+					* you want the world to move left
+					*/
+
+					/*
+						apply the rotation to the already applied rotation as to keep into account what is the orientation of the camera 
+					*/
+
+					/*
+						this camera rotation is actually an inverse value to apply to the world 
+					*/
 					cam_rot_inv = cam_rot_inv
 						* Mat4::RotationY( (float)-delta.x * htrack )
 						* Mat4::RotationX( (float)-delta.y * vtrack );
@@ -151,6 +203,16 @@ public:
 		pipeline.BeginFrame();
 
 		const auto proj = Mat4::ProjectionHFOV( hfov,aspect_ratio,0.2f,6.0f );
+
+		/*
+			translates the view in the opposite position to the camera position
+
+			as the view is always is the inverse of where the camera moves to. 
+
+			cam rot inv is applied, this this is the flipped orientation but is used to translate
+
+			our scene with respect to the camera
+		*/
 		const auto view = Mat4::Translation( -cam_pos ) * cam_rot_inv;
 
 		// render suzanne
@@ -160,20 +222,28 @@ public:
 			Mat4::RotationZ( theta_z ) *
 			Mat4::Scaling( scale ) *
 			Mat4::Translation( mod_pos ) *
+			/*
+				multiply this object by camera pos to obtain the position as it moves around inversely
+			*/
 			view
 		);
 		pipeline.effect.vs.BindProjection( proj );
+		/*
+			place our light into the same view as the other objects in the scene
+			
+			world > view space is just a translation from world space to obtain its value with respect to the camera 
+		*/
 		pipeline.effect.ps.SetLightPosition( l_pos * view );
 		pipeline.effect.ps.SetAmbientLight( l_ambient );
 		pipeline.effect.ps.SetDiffuseLight( l );
 		pipeline.Draw( itlist );
 
 		// draw light indicator with different pipeline
-		// don't call beginframe on this pipeline b/c wanna keep zbuffer contents
+		// don't call beginframe on this pipeline b/c wanna keep z buffer contents
 		// (don't like this assymetry but we'll live with it for now)
 		liPipeline.effect.vs.BindWorldView( Mat4::Translation( l_pos ) * view );
 		liPipeline.effect.vs.BindProjection( proj );
-		liPipeline.Draw( lightIndicator );
+		liPipeline.Draw( lightIndicator);
 
 		// draw walls (ceiling floor)
 		wPipeline.effect.vs.SetLightPosition( l_pos * view );
@@ -213,14 +283,32 @@ private:
 	static constexpr float vfov = hfov / aspect_ratio;
 	// camera stuff
 	MouseTracker mt;
+
+	/*
+		calculate ratio  of horizontal and vertical FOV over screen height/width
+
+		this calculates a tiny value in how many degrees to apply for every pixel 
+	*/
 	static constexpr float htrack = to_rad( hfov ) / (float)Graphics::ScreenWidth;
 	static constexpr float vtrack = to_rad( vfov ) / (float)Graphics::ScreenHeight;
 	static constexpr float cam_speed = 1.0f;
 	static constexpr float cam_roll_speed = PI;
+
+
+	/*
+		camera position 
+	*/
 	Vec3 cam_pos = { 0.0f,0.0f,0.0f };
+
+	/*
+		holds the inverse camera value, inverse in regards to the world view 
+	*/
 	Mat4 cam_rot_inv = Mat4::Identity();
 	// suzanne model stuff
 	IndexedTriangleList<Vertex> itlist = IndexedTriangleList<SpecularPhongPointScene::Vertex>::LoadNormals( "models\\suzanne.obj" );
+	/*
+		model position, used for suzanne to apply model matrix. 
+	*/
 	Vec3 mod_pos = { 1.2f,-0.4f,1.2f };
 	float theta_x = 0.0f;
 	float theta_y = 0.0f;

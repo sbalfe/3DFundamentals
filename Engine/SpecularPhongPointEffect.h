@@ -104,12 +104,24 @@ public:
 		Vec3 n;
 		Vec3 worldPos;
 	};
+	/* 
+		inherits the world view value and proj transformations from the base vertex shader class
+	*/
 	class VertexShader : public BaseVertexShader<VSOutput>
 	{
 	public:
 		typename BaseVertexShader::Output operator()( const Vertex& v ) const
 		{
 			const auto p4 = Vec4( v.pos );
+
+			/*
+				translate all vertices by the total world view proj matrix
+
+				normal and world pos must be in the same space therefore apply the same matrix
+
+				perspective projection applied to all the other ones of course. 
+
+			*/
 			return { p4 * worldViewProj,Vec4{ v.n,0.0f } * worldView,p4 * worldView };
 		}
 	};

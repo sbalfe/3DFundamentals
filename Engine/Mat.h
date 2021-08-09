@@ -69,6 +69,11 @@ public:
 		}
 		return result;
 	}
+
+	/*
+		reutrn inverse of matrix, must be orthogonal
+		this just performs a transpostion. 
+	*/
 	_Mat operator!() const
 	{
 		_Mat xp;
